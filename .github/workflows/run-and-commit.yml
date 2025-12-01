@@ -2,11 +2,11 @@ name: Refresh Calendar
 
 on:
   schedule:
-    - cron: "0 * * * *" # Runs every day at 6 AM CET (7 AM CEST)
-  workflow_dispatch: # Allows manual triggering
+    - cron: "0 * * * *" # aktuell jede Stunde
+  workflow_dispatch:
   push:
     branches:
-      - main # Trigger on commits to the main branch
+      - main
 
 jobs:
   run-and-commit:
@@ -16,10 +16,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Install GEANT CA certificate
+        run: |
+          sudo mkdir -p /usr/local/share/ca-certificates/extra
+          sudo cp certs/geant.pem /usr/local/share/ca-certificates/extra/geant.crt
+          sudo chmod 644 /usr/local/share/ca-certificates/extra/geant.crt
+          sudo update-ca-certificates
+
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: "^1.23.0" # Ensure a compatible Go version is used
+          go-version: "^1.23.0"
 
       - name: Install dependencies
         run: go mod tidy
